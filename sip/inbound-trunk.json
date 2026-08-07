@@ -1,0 +1,8 @@
+{
+  "trunk": {
+    "name": "MicroSIP local",
+    "numbers": ["500"],
+    "auth_username": "microsip",
+    "auth_password": "senha123"
+  }
+}

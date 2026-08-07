@@ -1,0 +1,8 @@
+{
+  "name": "MicroSIP para agente",
+  "rule": {
+    "dispatchRuleIndividual": {
+      "roomPrefix": "microsip-"
+    }
+  }
+}
