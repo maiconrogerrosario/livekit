@@ -9,7 +9,7 @@ services:
     networks: [livekit-net]
 
   livekit:
-    image: livekit/livekit-server:latest
+    image: livekit/livekit-server:v1.13.5
     container_name: livekit-sfu
     restart: unless-stopped
     command: --config /etc/livekit/livekit.yaml
@@ -23,7 +23,7 @@ services:
     networks: [livekit-net]
 
   sip:
-    image: livekit/sip:latest
+    image: livekit/sip:v1.9.0
     container_name: livekit-sip
     restart: unless-stopped
     depends_on: [redis, livekit]
@@ -32,13 +32,17 @@ services:
         api_key: "${LIVEKIT_API_KEY}"
         api_secret: "${LIVEKIT_API_SECRET}"
         ws_url: "${LIVEKIT_URL}"
+
         redis:
           address: "redis:6379"
+
         sip_port: ${SIP_PORT}
         rtp_port: ${RTP_PORT_START}-${RTP_PORT_END}
         use_external_ip: ${SIP_USE_EXTERNAL_IP}
+
         logging:
           level: debug
+
     ports:
       - "${SIP_PORT}:${SIP_PORT}/udp"
       - "${SIP_PORT}:${SIP_PORT}/tcp"
@@ -46,7 +50,9 @@ services:
     networks: [livekit-net]
 
   agent:
-    build: ./agent
+    build:
+      context: ./agent
+      dockerfile: Dockerfile
     container_name: livekit-realtime-agent
     restart: unless-stopped
     env_file: [.env]
@@ -54,7 +60,9 @@ services:
     networks: [livekit-net]
 
   web:
-    build: ./web
+    build:
+      context: ./web
+      dockerfile: Dockerfile
     container_name: livekit-mic-test
     restart: unless-stopped
     env_file: [.env]
@@ -62,6 +70,21 @@ services:
     ports:
       - "8080:8080"
     networks: [livekit-net]
+
+
+  sip-config:
+    build:
+      context: ./sip-config
+    container_name: livekit-sip-config
+    env_file:
+      - ./sip-config/.env
+    depends_on:
+      - livekit
+      - sip
+    networks:
+      - livekit-net
+    restart: "no"
+
 
 volumes:
   redis-data:
